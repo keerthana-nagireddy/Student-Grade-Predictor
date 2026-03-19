@@ -1,11 +1,13 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, session
 import pickle
 import os
 import sqlite3
+import uuid
 
 app = Flask(__name__)
+app.secret_key = "supersecretkey"  # Required for session
 
-# Load model safely
+# Load model once (GOOD)
 model_path = os.path.join(os.path.dirname(__file__), 'model.pkl')
 model = pickle.load(open(model_path, 'rb'))
 
@@ -16,6 +18,7 @@ def init_db():
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS history (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id TEXT,
             study_hours REAL,
             attendance REAL,
             assignments REAL,
@@ -30,6 +33,10 @@ init_db()
 # Home page
 @app.route('/')
 def home():
+    # Assign unique user_id if not exists
+    if 'user_id' not in session:
+        session['user_id'] = str(uuid.uuid4())
+
     return render_template('index.html')
 
 # Prediction page
@@ -44,31 +51,41 @@ def predict():
     attendance = float(request.form['attendance'])
     assignments = float(request.form['assignments'])
 
+    # Predict
     result = model.predict([[study_hours, attendance, assignments]])
     grade = result[0]
 
-    # Save to DB
-    conn = sqlite3.connect('database.db')
+    # Save to DB with user_id
+    user_id = session.get('user_id')
+
+    conn = sqlite3.connect('database.db', timeout=10)
     cursor = conn.cursor()
     cursor.execute(
-        "INSERT INTO history (study_hours, attendance, assignments, grade) VALUES (?, ?, ?, ?)",
-        (study_hours, attendance, assignments, grade)
+        "INSERT INTO history (user_id, study_hours, attendance, assignments, grade) VALUES (?, ?, ?, ?, ?)",
+        (user_id, study_hours, attendance, assignments, grade)
     )
     conn.commit()
     conn.close()
 
     return render_template('result.html', prediction=grade)
 
-# History page
+# History page (ONLY current user data)
 @app.route('/history')
 def history_page():
-    conn = sqlite3.connect('database.db')
+    user_id = session.get('user_id')
+
+    conn = sqlite3.connect('database.db', timeout=10)
     cursor = conn.cursor()
-    cursor.execute("SELECT study_hours, attendance, assignments, grade FROM history")
+    cursor.execute("""
+        SELECT study_hours, attendance, assignments, grade 
+        FROM history 
+        WHERE user_id = ?
+        ORDER BY id DESC
+    """, (user_id,))
+    
     rows = cursor.fetchall()
     conn.close()
 
-    # Convert to list of dicts
     history = []
     for row in rows:
         history.append({
@@ -81,5 +98,7 @@ def history_page():
     return render_template('history.html', history=history)
 
 
+# IMPORTANT for Render
 if __name__ == "__main__":
-    app.run()
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
