@@ -111,6 +111,9 @@ http://127.0.0.1:5000/
 * ☁️ Deploy the application online
 
 ---
+## 🌐 Live Demo
+
+https://student-grade-predictor-32sj.onrender.com/
 
 ## 👩‍💻 Author
 
