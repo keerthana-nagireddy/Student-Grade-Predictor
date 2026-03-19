@@ -3,8 +3,10 @@ import pickle
 
 app = Flask(__name__)
 
-# Load model
-model = pickle.load(open('model.pkl', 'rb'))
+import os
+
+model_path = os.path.join(os.path.dirname(__file__), 'model.pkl')
+model = pickle.load(open(model_path, 'rb'))
 
 # Store history
 history = []
@@ -45,4 +47,4 @@ def history_page():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
