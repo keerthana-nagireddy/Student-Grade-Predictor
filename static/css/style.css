@@ -124,25 +124,60 @@ footer {
     padding: 40px;
 }
 /* 🌙 DARK MODE */
+/* 🌙 DARK MODE FULL FIX */
 .dark-mode {
     background-color: #121212 !important;
     color: #ffffff !important;
 }
 
+/* Navbar */
 .dark-mode .navbar {
     background-color: #000 !important;
 }
 
+/* Cards */
 .dark-mode .card-dark {
     background-color: #1e1e1e !important;
-    color: white;
+    color: #ffffff !important;
+    border: 1px solid #333;
 }
 
+/* Headings */
+.dark-mode h1,
+.dark-mode h2,
+.dark-mode h3,
+.dark-mode h4,
+.dark-mode h5 {
+    color: #ffffff !important;
+}
+
+/* Paragraphs */
+.dark-mode p {
+    color: #d1d5db !important;
+}
+
+/* Fix muted text */
+.dark-mode .text-muted {
+    color: #cbd5e1 !important;
+}
+
+/* Buttons */
 .dark-mode .btn-light {
     background-color: #333;
     color: white;
+    border: none;
 }
 
-.dark-mode .text-muted {
-    color: #ccc !important;
+/* CTA button stays bright */
+.dark-mode .btn-primary {
+    background-color: #2563eb;
+}
+
+/* Improve section visibility */
+.dark-mode .container {
+    color: white;
+}
+.dark-mode .display-4 {
+    color: #ffffff;
+    text-shadow: 0px 0px 10px rgba(255,255,255,0.2);
 }
