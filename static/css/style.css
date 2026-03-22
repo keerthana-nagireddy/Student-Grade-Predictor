@@ -1,30 +1,31 @@
+/* 🔥 GLOBAL */
 body {
     margin: 0;
     font-family: 'Poppins', sans-serif;
     background: linear-gradient(to right, #e3f2fd, #bbdefb);
-    height: 100vh;
     color: #0d47a1;
 }
 
-/* Hero Section */
+/* 🔥 HERO SECTION */
 .hero {
-    height: 90vh;
+    padding: 80px 0;
+    text-align: center;
 }
 
-/* Title */
+/* 🔥 TITLE */
 .main-title {
     font-size: 3.5rem;
     font-weight: 700;
     color: #0d47a1;
 }
 
-/* Subtitle */
+/* 🔥 SUBTITLE */
 .subtitle {
     font-size: 1.2rem;
     color: #1565c0;
 }
 
-/* Button */
+/* 🔥 BUTTONS */
 .btn-glow {
     background: #2196f3;
     color: white;
@@ -39,27 +40,28 @@ body {
     transform: scale(1.05);
 }
 
-/* Navbar */
+/* 🔥 NAVBAR */
 .navbar {
     background-color: #0d47a1 !important;
 }
-/* Glass Card */
+
+/* 🔥 GLASS CARD (for forms) */
 .glass-card {
     width: 500px;
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.25);
     border-radius: 20px;
     backdrop-filter: blur(15px);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
 }
 
-/* Inputs */
+/* 🔥 INPUTS */
 .custom-input {
     border-radius: 10px;
     padding: 12px;
     border: none;
 }
 
-/* Gradient Button */
+/* 🔥 GRADIENT BUTTON */
 .btn-gradient {
     background: linear-gradient(45deg, #2196f3, #21cbf3);
     color: white;
@@ -73,14 +75,51 @@ body {
     transform: scale(1.05);
     box-shadow: 0px 0px 15px rgba(33, 150, 243, 0.6);
 }
-body.hero {
-    background: linear-gradient(to right, #dbeafe, #bfdbfe);
-}
 
+/* 🔥 FEATURE CARDS */
 .card {
-    transition: transform 0.3s ease;
+    border: none;
+    border-radius: 15px;
+    transition: all 0.3s ease;
 }
 
 .card:hover {
-    transform: scale(1.05);
+    transform: translateY(-8px);
+    box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* 🔥 SECTION SPACING */
+.container {
+    margin-top: 30px;
+}
+
+/* 🔥 HEADINGS */
+h1, h2, h3, h4 {
+    font-weight: 600;
+}
+
+/* 🔥 FOOTER */
+footer {
+    color: #0d47a1;
+    font-size: 14px;
+}
+
+/* 🔥 RESPONSIVE */
+@media (max-width: 768px) {
+    .main-title {
+        font-size: 2.2rem;
+    }
+
+    .glass-card {
+        width: 90%;
+    }
+}
+.section {
+    padding: 60px 0;
+}
+
+.alt-section {
+    background-color: rgba(255, 255, 255, 0.4);
+    border-radius: 15px;
+    padding: 40px;
 }

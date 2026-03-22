@@ -10,8 +10,12 @@ app.secret_key = "supersecretkey"
 
 
 # ---------------------- DATABASE ----------------------
+def get_connection():
+    return sqlite3.connect('database.db', timeout=10)
+
+
 def init_db():
-    conn = sqlite3.connect('database.db')
+    conn = get_connection()
     cursor = conn.cursor()
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS history (
@@ -43,33 +47,62 @@ def predict_page():
     return render_template('predict.html')
 
 
+# 🔥 PREDICT WITH VALIDATION
 @app.route('/predict', methods=['POST'])
 def predict():
-    study_hours = float(request.form['study_hours'])
-    attendance = float(request.form['attendance'])
-    assignments = float(request.form['assignments'])
+    try:
+        # 🔹 Safe input parsing (no default 0 → forces real input)
+        study_hours = float(request.form.get('study_hours', '').strip())
+        attendance = float(request.form.get('attendance', '').strip())
+        assignments = float(request.form.get('assignments', '').strip())
 
-    grade, recommendations = predict_grade(study_hours, attendance, assignments)
+        # 🔥 VALIDATION RULES
+        if study_hours < 0 or attendance < 0 or assignments < 0:
+            return render_template('predict.html', error="❌ Values cannot be negative")
 
-    user_id = session.get('user_id')
+        if attendance > 100:
+            return render_template('predict.html', error="❌ Attendance cannot exceed 100%")
 
-    conn = sqlite3.connect('database.db', timeout=10)
-    cursor = conn.cursor()
-    cursor.execute(
-        "INSERT INTO history (user_id, study_hours, attendance, assignments, grade) VALUES (?, ?, ?, ?, ?)",
-        (user_id, study_hours, attendance, assignments, grade)
-    )
-    conn.commit()
-    conn.close()
+        if study_hours > 24:
+            return render_template('predict.html', error="❌ Study hours cannot exceed 24")
 
-    return render_template('result.html', prediction=grade, recommendations=recommendations)
+        if assignments > 10:
+            return render_template('predict.html', error="❌ Assignments must be between 0 and 10")
+
+        # 🔹 Prediction
+        grade, recommendations = predict_grade(study_hours, attendance, assignments)
+
+        # 🔹 Save to DB
+        user_id = session.get('user_id')
+
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute(
+            "INSERT INTO history (user_id, study_hours, attendance, assignments, grade) VALUES (?, ?, ?, ?, ?)",
+            (user_id, study_hours, attendance, assignments, grade)
+        )
+        conn.commit()
+        conn.close()
+
+        return render_template(
+            'result.html',
+            prediction=grade,
+            recommendations=recommendations
+        )
+
+    except ValueError:
+        return render_template('predict.html', error="❌ Please enter valid numeric values")
+
+    except Exception as e:
+        print("Error:", e)  # 🔥 debugging help
+        return render_template('predict.html', error="❌ Something went wrong")
 
 
 @app.route('/history')
 def history_page():
     user_id = session.get('user_id')
 
-    conn = sqlite3.connect('database.db', timeout=10)
+    conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("""
         SELECT study_hours, attendance, assignments, grade 
@@ -81,14 +114,16 @@ def history_page():
     rows = cursor.fetchall()
     conn.close()
 
-    history = []
-    for row in rows:
-        history.append({
+    # 🔥 Cleaner conversion
+    history = [
+        {
             "study_hours": row[0],
             "attendance": row[1],
             "assignments": row[2],
             "grade": row[3]
-        })
+        }
+        for row in rows
+    ]
 
     return render_template('history.html', history=history)
 

@@ -10,6 +10,7 @@
 
 <body>
 
+<!-- 🔥 NAVBAR -->
 <nav class="navbar navbar-dark bg-dark">
     <div class="container">
         <a class="navbar-brand" href="/">🎓 Grade Predictor</a>
@@ -17,28 +18,54 @@
     </div>
 </nav>
 
-<div class="container d-flex justify-content-center align-items-center" style="height: 90vh;">
+<!-- 🔥 FORM SECTION -->
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 85vh;">
     
     <div class="glass-card p-5">
 
         <h2 class="text-center mb-4 fw-bold">Enter Student Details</h2>
 
+        <!-- 🔥 ERROR MESSAGE -->
+        {% if error %}
+        <div class="alert alert-danger text-center">
+            {{ error }}
+        </div>
+        {% endif %}
+
         <form action="/predict" method="post">
 
-            <input type="number" class="form-control custom-input mb-3" name="study_hours" placeholder="📘 Study Hours" required>
+            <!-- Study Hours -->
+            <div class="mb-3">
+                <label class="form-label fw-semibold">📚 Study Hours (0–24)</label>
+                <input type="number" name="study_hours" min="0" max="24" step="0.1" required class="form-control custom-input">
+            </div>
 
-            <input type="number" class="form-control custom-input mb-3" name="attendance" placeholder="📊 Attendance %" required>
+            <!-- Attendance -->
+            <div class="mb-3">
+                <label class="form-label fw-semibold">📅 Attendance (%)</label>
+                <input type="number" name="attendance" min="0" max="100" required class="form-control custom-input">
+            </div>
 
-            <input type="number" class="form-control custom-input mb-3" name="assignments" placeholder="📝 Assignments (out of 10)" required>
+            <!-- Assignments -->
+            <div class="mb-3">
+                <label class="form-label fw-semibold">📝 Assignments Completed (0–10)</label>
+                <input type="number" name="assignments" min="0" max="10" required class="form-control custom-input">
+            </div>
 
-            <button class="btn btn-gradient w-100 mt-2">Predict 🚀</button>
+            <!-- Button -->
+            <button class="btn btn-gradient w-100 mt-3">
+                🚀 Predict Grade
+            </button>
 
         </form>
 
     </div>
 
 </div>
+
+<!-- JS -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
 </body>
 </html>
