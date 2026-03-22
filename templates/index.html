@@ -17,6 +17,11 @@
         <div>
             <a href="/predict_page" class="btn btn-light">Predict</a>
             <a href="/history" class="btn btn-warning">History</a>
+
+            <!-- 🌙 DARK MODE BUTTON -->
+            <button onclick="toggleDarkMode()" class="btn btn-dark ms-2">
+                🌙
+            </button>
         </div>
     </div>
 </nav>
@@ -34,21 +39,21 @@
     <div class="row text-center">
 
         <div class="col-md-4">
-            <div class="p-4 shadow rounded">
+            <div class="p-4 shadow rounded card-dark">
                 <h4>📊 Accurate Predictions</h4>
                 <p>Machine learning model trained to predict student grades.</p>
             </div>
         </div>
 
         <div class="col-md-4">
-            <div class="p-4 shadow rounded">
+            <div class="p-4 shadow rounded card-dark">
                 <h4>💡 Smart Suggestions</h4>
                 <p>Get actionable recommendations to improve your performance.</p>
             </div>
         </div>
 
         <div class="col-md-4">
-            <div class="p-4 shadow rounded">
+            <div class="p-4 shadow rounded card-dark">
                 <h4>📈 Track Progress</h4>
                 <p>View your history and monitor improvement over time.</p>
             </div>
@@ -81,7 +86,7 @@
     </div>
 </div>
 
-<!-- 🔥 STATS SECTION -->
+<!-- 🔥 STATS -->
 <div class="container mt-5 text-center">
     <h2 class="mb-4">📊 Why Choose Us?</h2>
 
@@ -115,6 +120,27 @@
 <footer class="text-center mt-5 mb-3">
     <p>© 2026 Student Grade Predictor | Built with ❤️ using Flask & ML</p>
 </footer>
+
+<!-- 🔥 DARK MODE SCRIPT -->
+<script>
+function toggleDarkMode() {
+    document.body.classList.toggle("dark-mode");
+
+    // Save preference
+    if (document.body.classList.contains("dark-mode")) {
+        localStorage.setItem("theme", "dark");
+    } else {
+        localStorage.setItem("theme", "light");
+    }
+}
+
+// Load saved theme
+window.onload = function() {
+    if (localStorage.getItem("theme") === "dark") {
+        document.body.classList.add("dark-mode");
+    }
+}
+</script>
 
 </body>
 </html>

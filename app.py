@@ -3,7 +3,7 @@ import sqlite3
 import uuid
 import os
 
-from model.predict import predict_grade
+from model.predict import predict_grade, suggest_improvement
 
 app = Flask(__name__)
 app.secret_key = "supersecretkey"
@@ -47,16 +47,16 @@ def predict_page():
     return render_template('predict.html')
 
 
-# 🔥 PREDICT WITH VALIDATION
+# 🔥 PREDICT WITH VALIDATION + IMPROVEMENT
 @app.route('/predict', methods=['POST'])
 def predict():
     try:
-        # 🔹 Safe input parsing (no default 0 → forces real input)
+        # 🔹 Safe input parsing
         study_hours = float(request.form.get('study_hours', '').strip())
         attendance = float(request.form.get('attendance', '').strip())
         assignments = float(request.form.get('assignments', '').strip())
 
-        # 🔥 VALIDATION RULES
+        # 🔥 VALIDATION
         if study_hours < 0 or attendance < 0 or assignments < 0:
             return render_template('predict.html', error="❌ Values cannot be negative")
 
@@ -72,6 +72,9 @@ def predict():
         # 🔹 Prediction
         grade, recommendations = predict_grade(study_hours, attendance, assignments)
 
+        # 🔥 NEW: Improvement suggestion
+        improvement_tip = suggest_improvement(study_hours, attendance, assignments)
+
         # 🔹 Save to DB
         user_id = session.get('user_id')
 
@@ -84,17 +87,19 @@ def predict():
         conn.commit()
         conn.close()
 
+        # 🔥 Send everything to frontend
         return render_template(
             'result.html',
             prediction=grade,
-            recommendations=recommendations
+            recommendations=recommendations,
+            improvement=improvement_tip
         )
 
     except ValueError:
         return render_template('predict.html', error="❌ Please enter valid numeric values")
 
     except Exception as e:
-        print("Error:", e)  # 🔥 debugging help
+        print("Error:", e)
         return render_template('predict.html', error="❌ Something went wrong")
 
 
@@ -114,7 +119,6 @@ def history_page():
     rows = cursor.fetchall()
     conn.close()
 
-    # 🔥 Cleaner conversion
     history = [
         {
             "study_hours": row[0],

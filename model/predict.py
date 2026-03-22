@@ -40,3 +40,34 @@ def predict_grade(study_hours, attendance, assignments):
 
     recommendations = get_recommendations(study_hours, attendance, assignments, grade)
     return grade, recommendations
+
+def suggest_improvement(study_hours, attendance, assignments):
+    target = None
+
+    # Try increasing study hours
+    for h in range(int(study_hours), 25):
+        grade, _ = predict_grade(h, attendance, assignments)
+        if grade in ['A', 'A+']:
+            target = f"Increase study hours to {h}"
+            break
+
+    # Try attendance if not found
+    if not target:
+        for a in range(int(attendance), 101):
+            grade, _ = predict_grade(study_hours, a, assignments)
+            if grade in ['A', 'A+']:
+                target = f"Increase attendance to {a}%"
+                break
+
+    # Try assignments
+    if not target:
+        for ass in range(int(assignments), 11):
+            grade, _ = predict_grade(study_hours, attendance, ass)
+            if grade in ['A', 'A+']:
+                target = f"Complete at least {ass} assignments"
+                break
+
+    if not target:
+        target = "You're close! Improve all areas slightly to reach Grade A 🚀"
+
+    return target
