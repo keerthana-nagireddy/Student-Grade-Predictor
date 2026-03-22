@@ -1,17 +1,16 @@
 from flask import Flask, render_template, request, session
-import pickle
 import os
 import sqlite3
 import uuid
 
+# 🔥 Import your custom prediction function
+from model.predict import predict_grade
+
 app = Flask(__name__)
 app.secret_key = "supersecretkey"  # Required for session
 
-# Load model once (GOOD)
-model_path = os.path.join(os.path.dirname(__file__), 'model.pkl')
-model = pickle.load(open(model_path, 'rb'))
 
-# Database setup
+# ---------------------- DATABASE SETUP ----------------------
 def init_db():
     conn = sqlite3.connect('database.db')
     cursor = conn.cursor()
@@ -30,7 +29,10 @@ def init_db():
 
 init_db()
 
-# Home page
+
+# ---------------------- ROUTES ----------------------
+
+# 🏠 Home page
 @app.route('/')
 def home():
     # Assign unique user_id if not exists
@@ -39,23 +41,24 @@ def home():
 
     return render_template('index.html')
 
-# Prediction page
+
+# 📄 Prediction page
 @app.route('/predict_page')
 def predict_page():
     return render_template('predict.html')
 
-# Predict
+
+# 🤖 Predict + Recommendations
 @app.route('/predict', methods=['POST'])
 def predict():
     study_hours = float(request.form['study_hours'])
     attendance = float(request.form['attendance'])
     assignments = float(request.form['assignments'])
 
-    # Predict
-    result = model.predict([[study_hours, attendance, assignments]])
-    grade = result[0]
+    # 🔥 Prediction + Recommendations
+    grade, recommendations = predict_grade(study_hours, attendance, assignments)
 
-    # Save to DB with user_id
+    # Save to DB
     user_id = session.get('user_id')
 
     conn = sqlite3.connect('database.db', timeout=10)
@@ -67,9 +70,11 @@ def predict():
     conn.commit()
     conn.close()
 
-    return render_template('result.html', prediction=grade)
+    # 🔥 Send both grade and recommendations
+    return render_template('result.html', prediction=grade, recommendations=recommendations)
 
-# History page (ONLY current user data)
+
+# 📊 History page (ONLY current user)
 @app.route('/history')
 def history_page():
     user_id = session.get('user_id')
@@ -98,7 +103,7 @@ def history_page():
     return render_template('history.html', history=history)
 
 
-# IMPORTANT for Render
+# ---------------------- RUN APP ----------------------
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
