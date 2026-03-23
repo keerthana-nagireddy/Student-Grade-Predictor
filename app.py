@@ -47,7 +47,7 @@ def predict_page():
     return render_template('predict.html')
 
 
-# 🔥 PREDICT WITH VALIDATION + IMPROVEMENT
+# 🔥 PREDICT WITH VALIDATION + FIXED LOGIC
 @app.route('/predict', methods=['POST'])
 def predict():
     try:
@@ -72,8 +72,12 @@ def predict():
         # 🔹 Prediction
         grade, recommendations = predict_grade(study_hours, attendance, assignments)
 
-        # 🔥 NEW: Improvement suggestion
-        improvement_tip = suggest_improvement(study_hours, attendance, assignments)
+        # 🔥 ✅ FIXED LOGIC HERE
+        if grade == "A":
+            recommendations = "🌟 Good! Keep it up with your efforts 💪"
+            improvement_tip = None
+        else:
+            improvement_tip = suggest_improvement(study_hours, attendance, assignments)
 
         # 🔹 Save to DB
         user_id = session.get('user_id')
